@@ -1,25 +1,15 @@
 import streamlit as st
-from helpers import expand_competitor_report
+from llm import query_ollama
 
-def competitor_tab(company_name, team):
-    st.markdown("### 🔍 Competitor Launch Analysis")
-    if not company_name:
-        st.info("👆 Please enter a company name above to start the analysis")
-        return
+def show():
+    st.subheader("⚔️ Competitor Analysis")
 
-    analyze_btn = st.button("🚀 Analyze Competitor Strategy", key="competitor_btn", type="primary")
-
-    if analyze_btn and team:
-        with st.spinner("Analyzing competitor strategy..."):
-            bullets = team.run(
-                f"Generate up to 16 evidence-based insight bullets about {company_name}'s most recent product launches..."
-            )
-            long_text = expand_competitor_report(bullets.content, company_name)
-            st.session_state.competitor_response = long_text
-            st.success("✅ Competitor analysis ready")
-            st.rerun()
-
-    if st.session_state.get("competitor_response"):
-        st.divider()
-        st.markdown("### 📊 Analysis Results")
-        st.markdown(st.session_state.competitor_response)
+    competitor_name = st.text_input("Enter competitor name:")
+    if st.button("Analyze Competitor"):
+        if competitor_name:
+            with st.spinner("🤖 Thinking..."):
+                analysis = query_ollama(f"Analyze the competitor: {competitor_name}")
+            st.success("✅ Done!")
+            st.write(analysis)
+        else:
+            st.warning("Please enter a competitor name.")
