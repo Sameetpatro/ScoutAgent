@@ -1,5 +1,5 @@
 import streamlit as st
-from llm import query_ollama
+from hf_utils import query_hf
 
 def show():
     st.subheader("💬 Market Sentiment")
@@ -8,7 +8,7 @@ def show():
     if st.button("Analyze Sentiment"):
         if topic:
             with st.spinner("🧐 Checking sentiment..."):
-                sentiment = query_ollama(f"Analyze market sentiment about: {topic}")
+                sentiment = query_hf(f"Analyze market sentiment about: {topic}")
             st.success("✅ Done!")
             st.write(sentiment)
         else:

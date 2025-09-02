@@ -1,5 +1,5 @@
 import streamlit as st
-from llm import query_ollama
+from hf_utils import query_hf
 
 def show():
     st.subheader("📊 Launch Metrics")
@@ -8,7 +8,7 @@ def show():
     if st.button("Get Metrics Insights"):
         if product_name:
             with st.spinner("📈 Analyzing..."):
-                metrics = query_ollama(f"Provide KPIs and adoption metrics for product: {product_name}")
+                metrics = query_hf(f"Provide KPIs and adoption metrics for product: {product_name}")
             st.success("✅ Done!")
             st.write(metrics)
         else:

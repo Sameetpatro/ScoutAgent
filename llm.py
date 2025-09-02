@@ -1,34 +1,46 @@
-import subprocess
+# llm.py
+import os
+import requests
 
-def query_ollama(prompt, model="phi3:mini", num_predict=150):
+HF_API_KEY = os.getenv("HF_API_KEY")  # make sure you add this to .env
+MODEL = "mistralai/Mistral-7B-Instruct-v0.2"  # you can change to another free model
+
+
+def query_hf(prompt, model: str = MODEL, max_new_tokens: int = 150, temperature: float = 0.7):
     """
-    Sends a prompt to Ollama and returns the model's response.
-    - Default model: phi3:mini (lightweight & fast)
-    - num_predict: limits max tokens so it doesn’t hang
-    Requires Ollama installed & running locally.
+    Sends a prompt to Hugging Face Inference API and returns the model's response.
+    - Default model: Mistral-7B-Instruct (free, good for chat/inference)
+    - max_new_tokens: response length
+    - temperature: randomness (0.7 = balanced)
     """
+    headers = {
+        "Authorization": f"Bearer {HF_API_KEY}",
+        "Content-Type": "application/json"
+    }
+
+    payload = {
+        "inputs": prompt,
+        "parameters": {
+            "max_new_tokens": max_new_tokens,
+            "temperature": temperature
+        }
+    }
+
     try:
-        result = subprocess.run(
-            ["ollama", "run", model, f"--num-predict", str(num_predict)],
-            input=prompt.encode("utf-8"),
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            timeout=60  # prevent infinite hang
+        response = requests.post(
+            f"https://api-inference.huggingface.co/models/{model}",
+            headers=headers,
+            json=payload,
+            timeout=60
         )
 
-        if result.returncode != 0:
-            return f"[ERROR] Ollama failed: {result.stderr.decode('utf-8').strip()}"
+        if response.status_code != 200:
+            return f"[ERROR] Hugging Face API failed: {response.status_code} {response.text}"
 
-        output = result.stdout.decode("utf-8").strip()
+        data = response.json()
+        if isinstance(data, list) and len(data) > 0 and "generated_text" in data[0]:
+            return data[0]["generated_text"]
+        return "[ERROR] Unexpected Hugging Face response format."
 
-        # Sometimes Ollama outputs metadata → keep only last block of text
-        if "{" in output and "}" in output:
-            # try to cut metadata
-            parts = output.split("}")
-            output = parts[-1].strip()
-
-        return output or "[No response from Ollama]"
-    except subprocess.TimeoutExpired:
-        return "[ERROR] Ollama took too long to respond (timeout)."
     except Exception as e:
-        return f"[ERROR] Ollama query failed: {e}"
+        return f"[ERROR] Hugging Face query failed: {e}"

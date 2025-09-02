@@ -1,5 +1,5 @@
 import streamlit as st
-from llm import query_ollama
+from hf_utils import query_hf
 
 def show():
     st.subheader("⚔️ Competitor Analysis")
@@ -8,7 +8,7 @@ def show():
     if st.button("Analyze Competitor"):
         if competitor_name:
             with st.spinner("🤖 Thinking..."):
-                analysis = query_ollama(f"Analyze the competitor: {competitor_name}")
+                analysis = query_hf(f"Analyze the competitor: {competitor_name}")
             st.success("✅ Done!")
             st.write(analysis)
         else:

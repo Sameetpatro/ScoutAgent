@@ -1,5 +1,6 @@
 import streamlit as st
-from ollama_utils import query_ollama  # your function in ollama_utils.py
+from hf_utils import query_hf  # new Hugging Face function
+
 
 # ---------------------------
 # Page Config
@@ -69,7 +70,7 @@ if company_url:
         if st.button("Run Analysis", key="insights_btn"):
             with st.spinner("Analyzing product launch..."):
                 prompt = f"Analyze the product launch strategy for {company_url}"
-                result = query_ollama(prompt)
+                result = query_hf(prompt)
             st.markdown(f"**Analysis:**\n\n{result}")
 
     with tabs[1]:
@@ -77,7 +78,7 @@ if company_url:
         if st.button("Run Sentiment", key="sentiment_btn"):
             with st.spinner("Checking sentiment..."):
                 prompt = f"Analyze market sentiment for {company_url}"
-                result = query_ollama(prompt)
+                result = query_hf(prompt)
             st.markdown(f"**Sentiment:**\n\n{result}")
 
     with tabs[2]:
@@ -85,7 +86,7 @@ if company_url:
         if st.button("Run Metrics", key="metrics_btn"):
             with st.spinner("Evaluating metrics..."):
                 prompt = f"Analyze adoption metrics & KPIs for {company_url}"
-                result = query_ollama(prompt)
+                result = query_hf(prompt)
             st.markdown(f"**Metrics:**\n\n{result}")
 else:
     with tabs[0]:

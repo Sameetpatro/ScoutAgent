@@ -1,7 +1,6 @@
 import streamlit as st
 from crawler import fetch_page_text
-from llm import query_ollama
-
+from hf_utils import query_hf
 def show():
     st.subheader("🏢 Company Input")
 
@@ -10,7 +9,7 @@ def show():
         if company_url:
             with st.spinner("🔎 Fetching data..."):
                 page_text = fetch_page_text(company_url)
-                summary = query_ollama(f"Summarize the company from this text:\n{page_text}")
+                summary = query_hf(f"Summarize the company from this text:\n{page_text}")
             
             st.success("✅ Analysis complete!")
             st.write(summary)
